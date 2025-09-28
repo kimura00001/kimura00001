@@ -6,13 +6,15 @@ on:
     - cron: "0 21 * * 0"   # 週1（月曜 06:00 JST）
   workflow_dispatch:
 
+# commit / push するために必須
 permissions:
-  contents: write   # これ超重要（commit/push用）
+  contents: write
 
 jobs:
   metrics:
     runs-on: ubuntu-latest
     steps:
+      # 1) Metrics SVG を生成（出力名を固定）
       - uses: lowlighter/metrics@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -25,10 +27,10 @@ jobs:
           plugin_languages_sections: most-used, recently-used
           plugin_achievements: yes
           plugin_repositories: yes
-          filename: github-metrics.svg   # ← これで確実にこの名前で出力
+          filename: github-metrics.svg
 
+      # 2) main にコミット
       - uses: actions/checkout@v4
-
       - name: Commit metrics
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -40,6 +42,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Activity Graph（← master ではなく main）
+      - name: Generate Activity Graph
+        uses: Ashutosh00710/github-readme-activity-graph@main
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: kimura00001
+          OUTPUT_PATH: dist/activity-graph.svg
+          AREA: true
+
       # Snake
       - name: Generate Snake
         uses: Platane/snk@v3
@@ -48,15 +59,7 @@ jobs:
           outputs: |
             dist/snake.svg
 
-      # Activity Graph（← USERNAME 必須）
-      - name: Generate Activity Graph
-        uses: Ashutosh00710/github-readme-activity-graph@master
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: kimura00001
-          OUTPUT_PATH: dist/activity-graph.svg
-          AREA: true
-
+      # output ブランチへ配置
       - name: Push artifacts to output branch
         uses: crazy-max/ghaction-github-pages@v4
         with:
@@ -70,13 +73,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Summary Cards（自動pushは切る）
       - name: Generate Profile Summary Cards
         uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           USERNAME: kimura00001
-          THEME: default
+          AUTO_PUSH: "false"
+
+      # 生成物を自分でコミット
       - name: Commit cards
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
