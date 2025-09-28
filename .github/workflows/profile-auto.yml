@@ -2,9 +2,12 @@ name: Profile Auto Build
 
 on:
   schedule:
-    - cron: "0 20 * * *"   # 毎日 05:00 JST 実行（UTC基準）
-    - cron: "0 21 * * 0"   # 週1回 Metrics 生成（JST 朝6時）
+    - cron: "0 20 * * *"   # 毎日 05:00 JST
+    - cron: "0 21 * * 0"   # 週1（月曜 06:00 JST）
   workflow_dispatch:
+
+permissions:
+  contents: write   # これ超重要（commit/push用）
 
 jobs:
   metrics:
@@ -22,14 +25,9 @@ jobs:
           plugin_languages_sections: most-used, recently-used
           plugin_achievements: yes
           plugin_repositories: yes
+          filename: github-metrics.svg   # ← これで確実にこの名前で出力
 
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Move metrics output
-        run: |
-          # lowlighter/metrics はカレントに github-metrics.svg を吐く
-          mv github-metrics.svg ./github-metrics.svg || true
+      - uses: actions/checkout@v4
 
       - name: Commit metrics
         uses: stefanzweifel/git-auto-commit-action@v5
@@ -50,12 +48,12 @@ jobs:
           outputs: |
             dist/snake.svg
 
-      # Activity Graph
+      # Activity Graph（← USERNAME 必須）
       - name: Generate Activity Graph
         uses: Ashutosh00710/github-readme-activity-graph@master
         with:
-          # 色はデフォルト（いじりたいなら inputs 参照）
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          USERNAME: kimura00001
           OUTPUT_PATH: dist/activity-graph.svg
           AREA: true
 
@@ -64,6 +62,7 @@ jobs:
         with:
           target_branch: output
           build_dir: dist
+          keep_history: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -77,7 +76,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           USERNAME: kimura00001
-          # THEME は default / solarized / github 等。好みで変更可
           THEME: default
       - name: Commit cards
         uses: stefanzweifel/git-auto-commit-action@v5
