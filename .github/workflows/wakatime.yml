@@ -1,0 +1,22 @@
+name: WakaTime to README
+
+on:
+  schedule:
+    - cron: "0 22 * * *"  # 毎日07:00 JST
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: athul/waka-readme@master
+        with:
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          SHOW_TITLE: "true"
+          BLOCKS: "⬛⬛⬛⬛⬛⬛⬛⬛⬛⬛"
+          TIME_RANGE: last_7_days
+          LANG_COUNT: 8
+          COMMIT_MESSAGE: "chore: update WakaTime stats"
+          SECTION_NAME: "waka"
+          # 画像として使いたい場合（READMEの画像差し替え用）
+          # ここはテキスト埋め込みがデフォ。SVGにしたい時は別アクション選定。
