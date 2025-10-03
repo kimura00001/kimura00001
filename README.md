@@ -1,5 +1,5 @@
 <!-- ===== Profile Header (文章ほぼナシ) ===== -->
-<h1 align="center">kimura00001</h1>
+<h1 align="center">KimuraMotoyasu</h1>
 <p align="center">Auto-updated profile: languages, commits, graphs, metrics</p>
 
 <!-- Badges（自動値） -->
