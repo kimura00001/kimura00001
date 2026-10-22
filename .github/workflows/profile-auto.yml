@@ -3,78 +3,17 @@ name: Profile Auto Build
 on:
   schedule:
     - cron: "0 20 * * *"   # 毎日 05:00 JST
-    - cron: "0 21 * * 0"   # 週1（月曜 06:00 JST）
   workflow_dispatch:
 
-# commit / push するために必須
 permissions:
   contents: write
 
 jobs:
-  metrics:
-    runs-on: ubuntu-latest
-    steps:
-      # 1) Metrics SVG を生成（出力名を固定）
-      - uses: lowlighter/metrics@latest
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          user: kimura00001
-          template: classic
-          base: header, repositories, activity, community, metadata
-          config_timezone: Asia/Tokyo
-          plugin_languages: yes
-          plugin_languages_ignored: css, scss, html
-          plugin_languages_sections: most-used, recently-used
-          plugin_achievements: yes
-          plugin_repositories: yes
-          filename: github-metrics.svg
-
-      # 2) main にコミット
-      - uses: actions/checkout@v4
-      - name: Commit metrics
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: update github-metrics.svg"
-          file_pattern: "github-metrics.svg"
-
-  snake_and_graph:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      # Activity Graph（← master ではなく main）
-      - name: Generate Activity Graph
-        uses: Ashutosh00710/github-readme-activity-graph@main
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          USERNAME: kimura00001
-          OUTPUT_PATH: dist/activity-graph.svg
-          AREA: true
-
-      # Snake
-      - name: Generate Snake
-        uses: Platane/snk@v3
-        with:
-          github_user_name: kimura00001
-          outputs: |
-            dist/snake.svg
-
-      # output ブランチへ配置
-      - name: Push artifacts to output branch
-        uses: crazy-max/ghaction-github-pages@v4
-        with:
-          target_branch: output
-          build_dir: dist
-          keep_history: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   summary_cards:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Summary Cards（自動pushは切る）
       - name: Generate Profile Summary Cards
         uses: vn7n24fzkq/github-profile-summary-cards@release
         env:
@@ -83,9 +22,26 @@ jobs:
           USERNAME: kimura00001
           AUTO_PUSH: "false"
 
-      # 生成物を自分でコミット
+      # README で使っている default テーマだけをコミットする
       - name: Commit cards
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update summary cards"
-          file_pattern: "profile-summary-card-output/**"
+          file_pattern: "profile-summary-card-output/default/*"
+
+  snake:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Snake
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: kimura00001
+          outputs: dist/snake.svg
+
+      - name: Push to output branch
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          target_branch: output
+          build_dir: dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
