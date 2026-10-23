@@ -1,7 +1,5 @@
 <h1 align="center">Mo</h1>
 
----
-
 ### 📊 Activity
 
 <p>
