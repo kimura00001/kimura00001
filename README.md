@@ -1,10 +1,4 @@
-<h1 align="center">Kimura Motoyasu</h1>
-
-<p align="center">
-  <img src="https://img.shields.io/github/followers/kimura00001?style=flat&label=followers" alt="followers" />
-  <img src="https://img.shields.io/badge/location-Yokohama%2C%20Japan-informational?style=flat" alt="location" />
-  <img src="https://img.shields.io/badge/timezone-Asia%2FTokyo-informational?style=flat" alt="timezone" />
-</p>
+<h1 align="center">Mo</h1>
 
 ---
 
